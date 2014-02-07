@@ -29,7 +29,7 @@ class Board
     board.each_with_index do |row, ridx|
       next if ridx == 3
       next if ridx == 4
-      color = ( ridx > 4 ? :red : :black )
+      color = ( ridx > 4 ? :red : :blue )
       row.each_with_index do |tile, tidx|
         next if tidx.odd? == odd
         board[ridx][tidx] = Piece.new(self, color, [ridx, tidx])
@@ -62,19 +62,21 @@ class Board
   end
 
   def to_s
-    puts nil
-    string = ""
+    system "clear"
+    string = "\n"
     string += "   1  2  3  4  5  6  7  8\n\n"
     @grid.each_with_index do |row, ridx|
-      string += (ridx + 1).to_s + " "
-      row.each do |tile|
+      string += "#{ridx + 1} "
+      row.each_with_index do |tile, tidx|
+        background_color = ((tidx + ridx).even? ? :black : :white)
         if tile.nil?
-          string += " - "
+          string += "   ".colorize(:background => background_color)
         else
-          string += " " + tile.to_s + " "
+          piece_color = tile.color
+          string += " #{tile} ".colorize(:color => piece_color, :background => background_color)
         end
       end
-      string += " " + (ridx + 1).to_s
+      string += " #{ridx + 1}"
       string += "\n"
     end
     string += "\n   1  2  3  4  5  6  7  8\n"

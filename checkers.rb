@@ -14,7 +14,7 @@ class Game
   end
 
   def associate_players
-    @player1.color = :black
+    @player1.color = :blue
     @player2.color = :red
     @player1.board = @board
     @player2.board = @board
@@ -36,7 +36,7 @@ class Game
 end
 
 if __FILE__ == $PROGRAM_NAME
-  p1 = Player.new("Thor")
+  p1 = ComputerPlayer.new("BenQ")
   p2 = ComputerPlayer.new("Sam Sung")
   g = Game.new(p1, p2)
 

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 require 'colorize'
+require 'debugger'
 
 class Piece
   attr_reader :color, :board, :pos
@@ -19,9 +20,9 @@ class Piece
 
   def render(color)
     if king
-      color == :red ? "♛".red : "♕"
+      "♛"
     else
-      color == :red ? "◉".red : "◯"
+      "◉"
     end
   end
 
@@ -41,7 +42,7 @@ class Piece
   end
 
   def valid_spot?(pos)
-    @board.empty?(pos) && @board.on_board?(pos)
+    @board.on_board?(pos) && @board.empty?(pos)
   end
 
   def move_to!(pos)
@@ -84,6 +85,41 @@ class Piece
     true
   end
 
+  def valid_jumps # for ComputerPlayer to generate move sequences
+    start_pos = self.pos
+
+    possible_moves = []
+    jump_vectors.each do |vector|
+      possible_moves << [vector[0] + start_pos[0], vector[1] + start_pos[1]]
+    end
+    p "potential jump moves - #{possible_moves}"
+    possible_moves.select! do |target_pos|
+
+      jumped_pos = [(target_pos[0] + start_pos[0]) / 2, (target_pos[1] + start_pos[1]) / 2]
+
+      valid_spot?(target_pos) && !@board.empty?(jumped_pos) && !@board[jumped_pos].color == self.color
+    end
+    p "available jump moves - #{possible_moves}"
+    possible_moves
+  end
+
+  # def valid_move_sequences(move_sequence)
+  #   sequences = []
+  #   # p move_sequence
+  #   duped_board = @board.dup
+  #   duped_piece = duped_board[self.pos]
+  #
+  #   # p "valid jumps - #{duped_piece.valid_jumps}"
+  #   duped_piece.valid_jumps.each do |jump_pos|
+  #     new_sequence = move_sequence + [jump_pos]
+  #     #p new_sequence
+  #     sequences << new_sequence
+  #     sequences.concat(valid_move_sequences(new_sequence))
+  #   end
+  #
+  #   sequences
+  # end
+
   def jump!(pos)
     jumped_pos = [(pos[0] + self.pos[0]) / 2, (pos[1] + self.pos[1]) / 2]
     self.move_to!(pos)
@@ -102,7 +138,7 @@ class Piece
 
     def maybe_promote
       if (self.color == :red && self.pos[0] == 0) ||
-        (self.color == :black && self.pos[0] == 7)
+        (self.color == :blue && self.pos[0] == 7)
         # puts "King me!"
         self.king = true
       end
@@ -135,7 +171,7 @@ class Piece
           end
           self.maybe_promote unless king
           if real_time
-            sleep(0.2)
+            sleep(0.5)
             puts @board
           end
         end
